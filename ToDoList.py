@@ -1,50 +1,75 @@
+
 import PyQt5.QtWidgets as qtw
+
+initial_todos = [
+			{
+				"title": "Faire les courses",
+				"state": False,
+			},
+			{
+				"title": "Réviser les cours",
+				"state": False
+			},
+			{
+				"title": "Méditation",
+				"state": True
+			}
+		]
 
 class MainWindow(qtw.QWidget):
 	def __init__(self):
 		super().__init__()
-		self.counterTask = 1
+
+		self.todos = initial_todos  # Load from file
+
 		self.setWindowTitle("To Do List")
-		self.setLayout(qtw.QHBoxLayout())
-		self.setUI()
+		self.setLayout(qtw.QVBoxLayout())
+
+		self.setTodos()
+
 		self.show()
-	
-	def setUI(self):
-		container = qtw.QWidget()
-		container.setLayout(qtw.QGridLayout())
 
-		self.input1 = qtw.QLineEdit()
-		self.btn_add = qtw.QPushButton('Ajouter', clicked = self.addTask)
+	def setTodos(self):
+		# for todo in self.todos:
+		for i in range(len(self.todos)):
+			todo = self.todos[i]
+			# container
+			todoContainer = qtw.QWidget()
+			todoContainer.setLayout(qtw.QHBoxLayout())
 
-		container.layout().addWidget(self.input1,0,0,1,3)
-		container.layout().addWidget(self.btn_add,0,3)
+			#checkbox
+			checkbox = qtw.QCheckBox()
+			checkbox.setChecked(todo["state"])
+			todoContainer.layout().addWidget(checkbox)
+			self.todos[i]["checkbox"] = checkbox
+			checkbox.stateChanged.connect(self.checkboxStateChanged)
 
-		self.layout().addWidget(container)
+			##button
+			#btn_supprimer = qtw.QPushButton()
+			#todoContainer.layout().addWidget(btn_supprimer)
+			#self.todos[i]["btn_supprimer"] = btn_supprimer
+			#btn_supprimer.pressed.connect(self.btn_supprimerPressed)
+
+			# label
+			label = qtw.QLabel(todo["title"])
+			todoContainer.layout().addWidget(label)
+
+			self.layout().addWidget(todoContainer)
+
+	def checkboxStateChanged(self):
+		for i in range(len(self.todos)):
+			if (self.todos[i]["checkbox"]):
+				self.todos[i]["state"] = self.todos[i]["checkbox"].isChecked()
+		# Save to file
+		print(self.todos)
 
 
-	def addTask(self):
-		container = qtw.QWidget()
-		container.setLayout(qtw.QGridLayout())
-
-		self.taskLabel = qtw.QLabel(self.input1.text())
-		self.btn_check = qtw.QPushButton('Pas fait', clicked = self.check)
-		self.btn_supprimer = qtw.QPushButton('X', clicked = self.supprimer)
-
-		container.layout().addWidget(self.taskLabel,self.counterTask,0,1,3)
-		container.layout().addWidget(self.btn_check,self.counterTask,1)
-		container.layout().addWidget(self.btn_supprimer,self.counterTask,2)
-
-		self.layout().addWidget(container)
-		self.counterTask += 1
-
-	def supprimer(self):
-		a = 0
-
-	def check(self):
-		if self.btn_check.text() == 'Pas fait':
-			self.btn_check.setText('Fait')
-		elif self.btn_check.text() == 'Fait':
-			self.btn_check.setText('Pas fait')
+	#def btn_supprimerPressed(self):
+		#for i in range(len(self.todos)):
+		#	if(self.todos[i]["btn_supprimer"]):
+		#		del self.todos[i]
+		## Save to file
+		#print(self.todos)
 
 
 app = qtw.QApplication([])
